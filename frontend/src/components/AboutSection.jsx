@@ -1,5 +1,5 @@
 import { useState } from "react";
-// dasdas
+
 const AboutSection = ({ userData, isOwnProfile, onSave }) => {
 	const [isEditing, setIsEditing] = useState(false);
 	const [about, setAbout] = useState(userData.about || "");
