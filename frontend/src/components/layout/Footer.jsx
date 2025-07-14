@@ -6,10 +6,10 @@ const Footer = () => {
   return (
     <>
       {/* Contact Form Section Above Footer */}
-      <ContactForm/>
+      {/* <ContactForm/> */}
 
       {/* Main Footer */}
-      <footer className="bg-[#1CA59A] text-white">
+      <footer className="bg-[#269092] text-white">
         <div className="max-w-7xl mx-auto px-6 py-12 grid grid-cols-1 md:grid-cols-4 gap-8">
 
           {/* Logo and Slogan */}

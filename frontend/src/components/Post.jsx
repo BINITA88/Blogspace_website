@@ -728,6 +728,7 @@ const Post = ({ post }) => {
 								</div>
 							</div>
 						))}
+						
 					</div>
 				</div>
 			)}

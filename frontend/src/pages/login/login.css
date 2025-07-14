@@ -106,7 +106,7 @@
 
 .forgot-password-link {
   font-size: 12px;
-  color: #1a73e8;
+  color: #159A9C;
   text-decoration: none;
   border: none;
   background: none;
@@ -120,7 +120,7 @@
 .login-button {
   width: 100%;
   padding: 10px;
-  background-color: #1a365d;
+  background-color: #159A9C;
   color: white;
   border: none;
   border-radius: 5px;
@@ -130,7 +130,7 @@
 }
 
 .login-button:hover {
-  background-color: #2c5282;
+  background-color: #159A9C;
 }
 
 .separator {

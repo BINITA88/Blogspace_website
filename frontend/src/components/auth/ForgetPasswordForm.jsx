@@ -30,29 +30,17 @@ const ForgetPasswordForm = () => {
   };
 
   return (
-    <div className="max-w-md w-full bg-white p-8 rounded shadow">
-      <div className="flex justify-center mb-4">
-        <div className="p-3 bg-blue-200 rounded-2xl">
-          <Mail className="text-blue-600 w-8 h-8" />
-        </div>
-      </div>
-      <h2 className="text-2xl font-bold text-blue-800 mb-2 text-center">
-        Forgot Password?
-      </h2>
-      <p className="text-gray-600 mb-6 text-center">
-        Enter your email and we'll send you reset instructions.
-      </p>
-
-      <form onSubmit={handleSubmit} className="space-y-5">
+    <div className="max-w-md w-full bg-white p-8 ">
+      <form onSubmit={handleSubmit} className="space-y-6">
         <div className="relative">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
             <Mail className="h-5 w-5 text-gray-400" />
           </div>
           <input
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 pl-10"
+            className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#1CA59A] focus:border-[#1CA59A] pl-10 transition"
             placeholder="Enter your Email"
             required
           />
@@ -60,7 +48,7 @@ const ForgetPasswordForm = () => {
 
         <button
           type="submit"
-          className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium mt-2 disabled:opacity-50 flex items-center justify-center"
+          className="w-full bg-[#1CA59A] text-white py-3 rounded-2xl hover:bg-[#159A9C] transition-colors font-semibold flex items-center justify-center disabled:opacity-50"
           disabled={isLoading}
         >
           {isLoading ? (
@@ -73,18 +61,16 @@ const ForgetPasswordForm = () => {
           )}
         </button>
 
- <div className="text-center mt-6">
-  <p className="text-sm text-gray-600">
-    <Link
-      to="/signin"
-      style={{ color: '#159A9C' }}
-      className="hover:underline font-medium"
-    >
-      ← Return to Login
-    </Link>
-  </p>
-</div>
-
+        <div className="text-center mt-6">
+          <p className="text-sm text-gray-600">
+            <Link
+              to="/signin"
+              className="hover:underline font-medium text-[#1CA59A]"
+            >
+              ← Return to Login
+            </Link>
+          </p>
+        </div>
       </form>
     </div>
   );

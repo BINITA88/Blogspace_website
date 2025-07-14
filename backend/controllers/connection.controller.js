@@ -1,7 +1,48 @@
 import { sendConnectionAcceptedEmail } from "../emails/emailHandlers.js";
 import ConnectionRequest from "../models/connectionRequest.model.js";
+import ContactMessage from "../models/ContactMessage.js";
 import Notification from "../models/notification.model.js";
 import User from "../models/user.model.js";
+
+
+export const submitContactForm = async (req, res) => {
+  try {
+    const { name, email, message } = req.body;
+
+    // Validate required fields
+    if (!name || !email || !message) {
+      return res.status(400).json({ error: "All fields are required." });
+    }
+
+    // Create new contact form entry
+    const newContact = new ContactMessage({
+      name,
+      email,
+      message
+    });
+
+    await newContact.save();
+
+    res.status(201).json({ message: "Message received successfully!" });
+  } catch (err) {
+    console.error("Contact form error:", err.message);
+    res.status(500).json({ error: "Server error." });
+  }
+};
+
+
+// Get contact list
+export const getContactList = async (req, res) => {
+  try {
+    const contacts = await ContactMessage.find()
+      .sort({ createdAt: -1 }); // newest first
+    res.status(200).json(contacts);
+  } catch (err) {
+    console.error("Error fetching contact list:", err.message);
+    res.status(500).json({ error: "Server error." });
+  }
+};
+
 
 export const sendConnectionRequest = async (req, res) => {
 	try {

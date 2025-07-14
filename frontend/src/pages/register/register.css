@@ -86,7 +86,7 @@
 .register-button {
   width: 100%;
   padding: 10px;
-  background-color: #1a365d;
+  background-color: #159A9C;
   color: white;
   border: none;
   border-radius: 4px;
@@ -97,7 +97,7 @@
 }
 
 .register-button:hover {
-  background-color: #2c5282;
+  background-color: #159A9C;
 }
 
 .login-link {
@@ -108,7 +108,7 @@
 }
 
 .login-link a {
-  color: #1a365d;
+  color: #159A9C;
   text-decoration: none;
   font-weight: 600;
 }

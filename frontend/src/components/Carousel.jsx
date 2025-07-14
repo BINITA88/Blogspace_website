@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react'; 
-import cover from '../../src/assets/imgg/Australia.png';
-import cover1 from '../../src/assets/imgg/ca1.png';
-import cover2 from '../../src/assets/imgg/canada.png';
-import cover3 from '../../src/assets/imgg/ca2.png';
+import cover from '../../src/assets/imgg/trek2.png';
+import cover1 from '../../src/assets/imgg/cook1.jpg';
+import cover2 from '../../src/assets/imgg/trek.png';
+import cover3 from '../../src/assets/imgg/ca1.png';
 import { Link } from 'react-router-dom'
 const Carousel = () => {
   const [currentIndex, setCurrentIndex] = useState(0);

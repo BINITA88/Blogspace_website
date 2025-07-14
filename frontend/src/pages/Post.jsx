@@ -1242,26 +1242,511 @@
 // export default Postt;
 
 
+// import { useState, useEffect } from "react";
+// import {
+//   Bookmark,
+//   BookmarkCheck,
+//   Clock,
+//   Users,
+// } from "lucide-react";
+// import { useNavigate } from "react-router-dom";
+// import Carousel from "../components/Carousel";
+// import { useQuery } from "@tanstack/react-query";
+// import { axiosInstance } from "../lib/axios";
+// import BookPost from "../components/BookPost";
+// import RelatedTales from "../components/RelatedTales";
+// import ContactForm from "../components/ContactForm";
+
+// const Postt = () => {
+//   const [selectedUsers, setSelectedUsers] = useState({});
+//   const [savedPosts, setSavedPosts] = useState([]);
+//   const [selectedCategory, setSelectedCategory] = useState("All");
+//   const [openedPost, setOpenedPost] = useState(null);
+
+//   const navigate = useNavigate();
+
+//   const { data: posts = [] } = useQuery({
+//     queryKey: ["posts"],
+//     queryFn: async () => {
+//       const res = await axiosInstance.get("/posts");
+//       return res.data;
+//     },
+//   });
+
+//   const { data: users = [] } = useQuery({
+//     queryKey: ["users"],
+//     queryFn: async () => {
+//       const res = await axiosInstance.get("/users/suggestions");
+//       return res.data;
+//     },
+//   });
+
+//   useEffect(() => {
+//     const saved = JSON.parse(localStorage.getItem("savedPosts")) || [];
+//     setSavedPosts(saved);
+//   }, []);
+
+//   const isSaved = (postId) => savedPosts.some((p) => p._id === postId);
+
+//   const toggleSavePost = (post) => {
+//     const existing = JSON.parse(localStorage.getItem("savedPosts")) || [];
+//     const updated = existing.find((p) => p._id === post._id)
+//       ? existing.filter((p) => p._id !== post._id)
+//       : [...existing, post];
+//     localStorage.setItem("savedPosts", JSON.stringify(updated));
+//     setSavedPosts(updated);
+//   };
+
+//   const handleSharePost = (postId) => {
+//     const selectedOption = selectedUsers[postId];
+//     if (!selectedOption) return;
+//     const selectedUser = selectedOption.user;
+//     const post = posts.find((p) => p._id === postId);
+//     navigate("/messenger", {
+//       state: { user: selectedUser, post, messageText: post.content },
+//     });
+//   };
+
+//   const categories = ["All", ...new Set(posts.map((p) => p.category).filter(Boolean))];
+//   const filteredPosts = posts.filter((p) =>
+//     selectedCategory === "All" || p.category === selectedCategory
+//   );
+
+//   return (
+//     <div className="p-6 overflow-auto">
+//       {openedPost ? (
+//         <div className="flex flex-col lg:flex-row gap-10">
+//           <div className="flex-1">
+//             <BookPost
+//               post={openedPost}
+//               isSaved={isSaved(openedPost._id)}
+//               onToggleSave={toggleSavePost}
+//               onShare={handleSharePost}
+//               onLike={() => {}}
+//               onComment={() => {}}
+//             />
+//           </div>
+//           <div className="w-full lg:w-[340px]">
+//             <RelatedTales posts={posts} currentPostId={openedPost._id} />
+//           </div>
+//         </div>
+//       ) : (
+//         <>
+//           {posts.length > 0 && <div className="mb-8"><Carousel /></div>}
+//           <div className="max-w-7xl mx-auto mt-28 mb-8 flex gap-2 flex-wrap justify-center">
+//             {categories.map((category) => (
+//               <button
+//                 key={category}
+//                 onClick={() => setSelectedCategory(category)}
+//                 className={`px-4 py-2 rounded-full border text-sm font-medium transition-all ${selectedCategory === category ? "text-white border-0 bg-[#159A9C]" : "bg-white text-gray-600 border-gray-300 hover:bg-blue-100"}`}
+//               >
+//                 {category}
+//               </button>
+//             ))}
+//           </div>
+//           <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+//             {filteredPosts.length > 0 ? (
+//               filteredPosts.map((post) => (
+//                 <div
+//                   key={post._id}
+//                   className="bg-white rounded-xl shadow hover:shadow-lg transition-all duration-300 overflow-hidden relative flex flex-col cursor-pointer"
+//                   onClick={() => setOpenedPost(post)}
+//                 >
+//                   <button
+//                     onClick={(e) => {
+//                       e.stopPropagation();
+//                       toggleSavePost(post);
+//                     }}
+//                     className="absolute top-3 right-3 bg-white p-1 rounded-full shadow hover:bg-blue-100 transition"
+//                   >
+//                     {isSaved(post._id) ? (
+//                       <BookmarkCheck size={20} className="text-blue-500" />
+//                     ) : (
+//                       <Bookmark size={20} className="text-blue-500" />
+//                     )}
+//                   </button>
+
+//                   {post.image ? (
+//                     <img
+//                       src={post.image}
+//                       alt={post.title || "Post Image"}
+//                       style={{
+//                         width: "100%",
+//                         height: "180px",
+//                         objectFit: "cover",
+//                         borderTopLeftRadius: "12px",
+//                         borderTopRightRadius: "12px",
+//                       }}
+//                     />
+//                   ) : (
+//                     <div style={{ width: '100%', height: '180px', background: 'linear-gradient(to right, #cce5ff, #d5d5ff)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '2rem', fontWeight: 'bold' }}>
+//                       {post.title?.charAt(0)?.toUpperCase() || "P"}
+//                     </div>
+//                   )}
+
+//                   <div className="p-4 flex flex-col flex-grow">
+//                     {post.category && (
+//                       <span className="inline-block mb-2 text-xs font-semibold text-blue-600 bg-blue-100 px-3 py-1 rounded-full self-start">
+//                         {post.category}
+//                       </span>
+//                     )}
+//                     <h3 className="font-bold text-base text-gray-800 mb-2 line-clamp-2 hover:text-blue-600 transition">
+//                       {post.title}
+//                     </h3>
+//                     <p className="text-gray-600 text-sm mb-3 line-clamp-2">
+//                       {post.content.substring(0, 100)}...
+//                     </p>
+//                     <div className="mt-auto flex items-center justify-between text-xs text-gray-500">
+//                       <div className="flex items-center gap-2">
+//                         {post.author?.avatar ? (
+//                           <img
+//                             src={post.author.avatar}
+//                             alt="author"
+//                             style={{ width: 24, height: 24, borderRadius: '50%', objectFit: 'cover' }}
+//                           />
+//                         ) : (
+//                           <div className="bg-gradient-to-r from-blue-500 to-purple-500 text-white w-6 h-6 rounded-full flex items-center justify-center font-medium">
+//                             {post.author?.name?.charAt(0)?.toUpperCase() || "A"}
+//                           </div>
+//                         )}
+//                         <span>{post.author?.name || "Anonymous"}</span>
+//                       </div>
+//                       <div className="flex items-center gap-1">
+//                         <Clock size={12} />
+//                         <span>{new Date(post.createdAt).toLocaleDateString()}</span>
+//                       </div>
+//                     </div>
+//                   </div>
+//                 </div>
+//               ))
+//             ) : (
+//               <div className="bg-white rounded-lg shadow p-8 text-center col-span-full">
+//                 <Users size={64} className="mx-auto text-blue-500" />
+//                 <h2 className="text-2xl font-bold mb-4 text-gray-800">No Posts Found</h2>
+//                 <p className="text-gray-600">Try a different search or connect with others.</p>
+//               </div>
+//             )}
+//           </div>
+//         </>
+//       )}
+//       <ContactForm/>
+//     </div>
+//   );
+// };
+
+// export default Postt;
+
+// import { useState, useEffect } from "react";
+// import {
+//   Bookmark,
+//   BookmarkCheck,
+//   Clock,
+//   Users,
+//   Heart,
+
+// } from "lucide-react";
+// import { useNavigate } from "react-router-dom";
+// import Carousel from "../components/Carousel";
+// import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+// import { axiosInstance } from "../lib/axios";
+// import toast from "react-hot-toast";
+// import BookPost from "../components/BookPost";
+// import RelatedTales from "../components/RelatedTales";
+// import ContactForm from "../components/ContactForm";
+// import CommentsSection from "../components/CommentsSection";
+// import CounterThree from "../components/CounterThree";
+
+// const Postt = () => {
+//   const [savedPosts, setSavedPosts] = useState([]);
+//   const [selectedCategory, setSelectedCategory] = useState("All");
+//   const [openedPost, setOpenedPost] = useState(null);
+//   const [commentBoxes, setCommentBoxes] = useState({});
+//   const [commentInputs, setCommentInputs] = useState({});
+//   const [localLikes, setLocalLikes] = useState({});
+
+//   const navigate = useNavigate();
+//   const queryClient = useQueryClient();
+
+//   const { data: posts = [] } = useQuery({
+//     queryKey: ["posts"],
+//     queryFn: async () => {
+//       const res = await axiosInstance.get("/posts");
+//       return res.data;
+//     },
+//   });
+
+//   const { mutate: likePost } = useMutation({
+//     mutationFn: async (postId) => {
+//       await axiosInstance.post(/posts/${postId}/like);
+//     },
+//     onSuccess: () => {
+//       queryClient.invalidateQueries({ queryKey: ["posts"] });
+//     },
+//   });
+
+//   const { mutate: commentPost } = useMutation({
+//     mutationFn: async ({ postId, content }) => {
+//       await axiosInstance.post(/posts/${postId}/comment, { content });
+//     },
+//     onSuccess: () => {
+//       toast.success("Comment added!");
+//       queryClient.invalidateQueries({ queryKey: ["posts"] });
+//     },
+//     onError: () => {
+//       toast.error("Failed to comment");
+//     },
+//   });
+
+//   const handleCommentSubmit = (postId) => {
+//     const commentText = commentInputs[postId];
+//     if (!commentText?.trim()) return;
+//     commentPost({ postId, content: commentText });
+//     setCommentInputs((prev) => ({ ...prev, [postId]: "" }));
+//   };
+
+//   const toggleCommentBox = (postId) => {
+//     setCommentBoxes((prev) => ({
+//       ...prev,
+//       [postId]: !prev[postId],
+//     }));
+//   };
+
+//   useEffect(() => {
+//     const saved = JSON.parse(localStorage.getItem("savedPosts")) || [];
+//     setSavedPosts(saved);
+//   }, []);
+
+//   useEffect(() => {
+//     if (!posts.length) return;
+//     let likesMap = {};
+//     posts.forEach((p) => {
+//       likesMap[p._id] = p.likes?.length || 0;
+//     });
+//     setLocalLikes(likesMap);
+//   }, [posts]);
+
+//   const isSaved = (postId) => savedPosts.some((p) => p._id === postId);
+
+//   const toggleSavePost = (post) => {
+//     const existing = JSON.parse(localStorage.getItem("savedPosts")) || [];
+//     const updated = existing.find((p) => p._id === post._id)
+//       ? existing.filter((p) => p._id !== post._id)
+//       : [...existing, post];
+//     localStorage.setItem("savedPosts", JSON.stringify(updated));
+//     setSavedPosts(updated);
+//   };
+
+//   const currentUserId = "currentUserId";
+//   const hasUserLiked = (post) => {
+//     return post.likes?.some((like) => like.userId === currentUserId);
+//   };
+
+//   const handleLikeClick = (e, post) => {
+//     e.stopPropagation();
+//     setLocalLikes((prev) => ({
+//       ...prev,
+//       [post._id]: prev[post._id] + (hasUserLiked(post) ? -1 : 1),
+//     }));
+//     likePost(post._id);
+//   };
+
+//   const categories = ["All", ...new Set(posts.map((p) => p.category).filter(Boolean))];
+//   const filteredPosts = posts.filter(
+//     (p) => selectedCategory === "All" || p.category === selectedCategory
+//   );
+
+//   return (
+//     <div className="pt-6 p-3 overflow-auto">
+//       {openedPost ? (
+//   <div className="max-w-7xl mx-auto pt-6 flex flex-col gap-6">
+//     {/* First Row: BookPost and RelatedTales side-by-side */}
+//     <div className="flex flex-col lg:flex-row gap-12">
+//       <div className="flex-1">
+//         <BookPost
+//           post={openedPost}
+//           isSaved={isSaved(openedPost._id)}
+//           onToggleSave={toggleSavePost}
+//           onShare={() => {}}
+//           onLike={() => {}}
+//           onComment={() => {}}
+//         />
+//       </div>
+
+//       <div className="w-full lg:w-[340px]">
+//         <RelatedTales posts={posts} currentPostId={openedPost._id} />
+//       </div>
+//     </div>
+
+//     {/* Second Row: CommentsSection full width */}
+//     <div className="w-full">
+//       <CommentsSection
+//         comments={openedPost.comments || []}
+//         commentValue={commentInputs[openedPost._id] || ""}
+//         onCommentChange={(val) =>
+//           setCommentInputs((prev) => ({ ...prev, [openedPost._id]: val }))
+//         }
+//         onSubmitComment={() => handleCommentSubmit(openedPost._id)}
+//         onClose={() => toggleCommentBox(openedPost._id)}
+//       />
+//     </div>
+//   </div>
+// ) : (
+
+//         <>
+//           {posts.length > 0 && (
+//             <div className="mb-8">
+//               <Carousel />
+//             </div>
+//           )}
+//           <div className="max-w-7xl mx-auto  mt-28 mb-8 flex gap-2 flex-wrap justify-center">
+//             {categories.map((category) => (
+//               <button
+//                 key={category}
+//                 onClick={() => setSelectedCategory(category)}
+//                 className={`px-4 py-2 rounded-full border text-sm font-medium transition-all ${
+//                   selectedCategory === category
+//                     ? "text-white border-0 bg-[#159A9C]"
+//                     : "bg-white text-gray-600 border-gray-300 hover:bg-blue-100"
+//                 }`}
+//               >
+//                 {category}
+//               </button>
+//             ))}
+//           </div>
+//           <div className="max-w-7xl mx-auto grid p-3 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+//             {filteredPosts.length > 0 ? (
+//               filteredPosts.map((post) => (
+//                 <div
+//                   key={post._id}
+//                   className="bg-white rounded-2xl shadow-md hover:shadow-xl hover:scale-[1.01] transition-all duration-300 overflow-hidden relative flex flex-col cursor-pointer"
+//                   onClick={() => setOpenedPost(post)}
+//                 >
+//                   <button
+//                     onClick={(e) => {
+//                       e.stopPropagation();
+//                       toggleSavePost(post);
+//                     }}
+//                     className="absolute top-3 right-3 bg-white p-1 rounded-full shadow hover:bg-blue-100 transition"
+//                   >
+//                     {isSaved(post._id) ? (
+//                       <BookmarkCheck size={20} className="text-blue-500" />
+//                     ) : (
+//                       <Bookmark size={20} className="text-blue-500" />
+//                     )}
+//                   </button>
+
+//                   {post.image ? (
+//                     <img
+//                       src={post.image}
+//                       alt={post.title || "Post Image"}
+//                       className="w-full h-[180px] object-cover"
+//                     />
+//                   ) : (
+//                     <div className="w-full h-[180px] bg-gradient-to-r from-blue-200 to-indigo-300 flex items-center justify-center text-white text-3xl font-bold">
+//                       {post.title?.charAt(0)?.toUpperCase() || "P"}
+//                     </div>
+//                   )}
+
+//                   <div className="p-4 flex flex-col flex-grow">
+//                     {post.category && (
+//                       <span className="inline-block mb-2 text-xs font-semibold text-blue-600 bg-blue-100 px-3 py-1 rounded-full self-start">
+//                         {post.category}
+//                       </span>
+//                     )}
+//                     <h3 className="font-bold text-base text-gray-800 mb-2 line-clamp-2 hover:text-blue-600 transition">
+//                       {post.title}
+//                     </h3>
+//                     <p className="text-gray-600 text-sm mb-3 line-clamp-2">
+//                       {post.content.substring(0, 100)}...
+//                     </p>
+
+//                     <div className="mt-auto flex items-center justify-between text-xs text-gray-500">
+//                       <div className="flex items-center gap-2">
+//                         {post.author?.profilePicture ? (
+//                           <img
+//                             src={post.author.profilePicture}
+//                             alt="author"
+//                             className="w-6 h-6 rounded-full object-cover"
+//                           />
+//                         ) : (
+//                           <div className="bg-gradient-to-r from-blue-500 to-purple-500 text-white w-6 h-6 rounded-full flex items-center justify-center font-medium">
+//                             {post.author?.name?.charAt(0)?.toUpperCase() || "A"}
+//                           </div>
+//                         )}
+//                         <span>{post.author?.name || "Anonymous"}</span>
+//                       </div>
+//                       <div className="flex items-center gap-1">
+//                         <Clock size={12} />
+//                         <span>{new Date(post.createdAt).toLocaleDateString()}</span>
+//                       </div>
+//                     </div>
+
+//                     <div className="mt-3 flex items-center justify-between text-gray-600 text-sm px-1">
+//                       <button
+//                         className="flex items-center gap-1 hover:text-red-500 transition"
+//                         onClick={(e) => {
+//                           e.stopPropagation();
+//                           likePost(post._id);
+//                         }}
+//                       >
+//                         <Heart size={18} className="transition-transform duration-200 hover:scale-110" />
+//                         <span>{post.likes?.length || 0}</span>
+//                       </button>
+//                     </div>
+//                   </div>
+//                 </div>
+//               ))
+//             ) : (
+//               <div className="bg-white rounded-lg shadow p-8 text-center col-span-full">
+//                 <Users size={64} className="mx-auto text-blue-500" />
+//                 <h2 className="text-2xl font-bold mb-4 text-gray-800">No Posts Found</h2>
+//                 <p className="text-gray-600">Try a different search or connect with others.</p>
+//               </div>
+//             )}
+//           </div>
+//           <CounterThree/>
+//         </>
+
+//       )}
+//       {!openedPost && <ContactForm />}
+//     </div>
+//   );
+// };
+
+// export default Postt;
+
+
+
 import { useState, useEffect } from "react";
 import {
   Bookmark,
   BookmarkCheck,
   Clock,
   Users,
+  Heart,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Carousel from "../components/Carousel";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { axiosInstance } from "../lib/axios";
+import toast from "react-hot-toast";
 import BookPost from "../components/BookPost";
 import RelatedTales from "../components/RelatedTales";
+import ContactForm from "../components/ContactForm";
+import CommentsSection from "../components/CommentsSection";
+import CounterThree from "../components/CounterThree";
+import LandingPage from "../components/BlogPlatformLanding";
+import Whyus from "../components/whyus";
+import NepaliNews from "../components/webscrapping";
+
 
 const Postt = () => {
-  const [selectedUsers, setSelectedUsers] = useState({});
   const [savedPosts, setSavedPosts] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [openedPost, setOpenedPost] = useState(null);
-
+  const [commentInputs, setCommentInputs] = useState({});
+  const [localLikes, setLocalLikes] = useState({});
+  const queryClient = useQueryClient();
   const navigate = useNavigate();
 
   const { data: posts = [] } = useQuery({
@@ -1272,18 +1757,48 @@ const Postt = () => {
     },
   });
 
-  const { data: users = [] } = useQuery({
-    queryKey: ["users"],
-    queryFn: async () => {
-      const res = await axiosInstance.get("/users/suggestions");
-      return res.data;
+  const { mutate: likePost } = useMutation({
+    mutationFn: async (postId) => {
+      await axiosInstance.post(`/posts/${postId}/like`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["posts"] });
     },
   });
+
+  const { mutate: commentPost } = useMutation({
+    mutationFn: async ({ postId, content }) => {
+      await axiosInstance.post(`/posts/${postId}/comment`, { content });
+    },
+    onSuccess: () => {
+      toast.success("Comment added!");
+      queryClient.invalidateQueries({ queryKey: ["posts"] });
+    },
+    onError: () => {
+      toast.error("Failed to comment");
+    },
+  });
+
+  const handleCommentSubmit = (postId) => {
+    const commentText = commentInputs[postId];
+    if (!commentText?.trim()) return;
+    commentPost({ postId, content: commentText });
+    setCommentInputs((prev) => ({ ...prev, [postId]: "" }));
+  };
 
   useEffect(() => {
     const saved = JSON.parse(localStorage.getItem("savedPosts")) || [];
     setSavedPosts(saved);
   }, []);
+
+  useEffect(() => {
+    if (!posts.length) return;
+    const likesMap = {};
+    posts.forEach((p) => {
+      likesMap[p._id] = p.likes?.length || 0;
+    });
+    setLocalLikes(likesMap);
+  }, [posts]);
 
   const isSaved = (postId) => savedPosts.some((p) => p._id === postId);
 
@@ -1296,59 +1811,75 @@ const Postt = () => {
     setSavedPosts(updated);
   };
 
-  const handleSharePost = (postId) => {
-    const selectedOption = selectedUsers[postId];
-    if (!selectedOption) return;
-    const selectedUser = selectedOption.user;
-    const post = posts.find((p) => p._id === postId);
-    navigate("/messenger", {
-      state: { user: selectedUser, post, messageText: post.content },
-    });
-  };
-
   const categories = ["All", ...new Set(posts.map((p) => p.category).filter(Boolean))];
-  const filteredPosts = posts.filter((p) =>
-    selectedCategory === "All" || p.category === selectedCategory
+  const filteredPosts = posts.filter(
+    (p) => selectedCategory === "All" || p.category === selectedCategory
   );
 
   return (
-    <div className="p-6 overflow-auto">
+    <div className="pt-6 ">
       {openedPost ? (
-        <div className="flex flex-col lg:flex-row gap-10">
-          <div className="flex-1">
-            <BookPost
-              post={openedPost}
-              isSaved={isSaved(openedPost._id)}
-              onToggleSave={toggleSavePost}
-              onShare={handleSharePost}
-              onLike={() => {}}
-              onComment={() => {}}
+        <div className="max-w-7xl mx-auto flex flex-col gap-6">
+          {/* Row 1: BookPost + RelatedTales */}
+          <div className="flex flex-col lg:flex-row gap-6">
+            <div className="flex-1">
+              <BookPost
+                post={openedPost}
+                isSaved={isSaved(openedPost._id)}
+                onToggleSave={toggleSavePost}
+                onShare={() => {}}
+                onLike={() => {}}
+                onComment={() => {}}
+              />
+            </div>
+            <div className="w-full lg:w-[340px]">
+              <RelatedTales posts={posts} currentPostId={openedPost._id} />
+            </div>
+          </div>
+          {/* Row 2: Comment Section */}
+          <div className="w-80% mb-10">
+            <CommentsSection
+              comments={openedPost.comments || []}
+              commentValue={commentInputs[openedPost._id] || ""}
+              onCommentChange={(val) =>
+                setCommentInputs((prev) => ({ ...prev, [openedPost._id]: val }))
+              }
+              onSubmitComment={() => handleCommentSubmit(openedPost._id)}
+              onClose={() => setOpenedPost(null)}
+              userProfilePicture={openedPost.author?.profilePicture}
             />
           </div>
-          <div className="w-full lg:w-[340px]">
-            <RelatedTales posts={posts} currentPostId={openedPost._id} />
-          </div>
+          
         </div>
       ) : (
         <>
-          {posts.length > 0 && <div className="mb-8"><Carousel /></div>}
+          {posts.length > 0 && <Carousel />}
+
+
+          
           <div className="max-w-7xl mx-auto mt-28 mb-8 flex gap-2 flex-wrap justify-center">
             {categories.map((category) => (
               <button
                 key={category}
                 onClick={() => setSelectedCategory(category)}
-                className={`px-4 py-2 rounded-full border text-sm font-medium transition-all ${selectedCategory === category ? "text-white border-0 bg-[#159A9C]" : "bg-white text-gray-600 border-gray-300 hover:bg-blue-100"}`}
+                className={`px-4 py-2 rounded-full border text-sm font-medium transition-all ${
+                  selectedCategory === category
+                    ? "text-white border-0 bg-[#159A9C]"
+                    : "bg-white text-gray-600 border-gray-300 hover:bg-blue-100"
+                }`}
               >
                 {category}
               </button>
             ))}
           </div>
-          <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+
+
+          <div className="max-w-7xl mx-auto grid p-3 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
             {filteredPosts.length > 0 ? (
               filteredPosts.map((post) => (
                 <div
                   key={post._id}
-                  className="bg-white rounded-xl shadow hover:shadow-lg transition-all duration-300 overflow-hidden relative flex flex-col cursor-pointer"
+                  className="bg-white rounded-2xl shadow-md hover:shadow-xl hover:scale-[1.01] transition-all duration-300 overflow-hidden relative flex flex-col cursor-pointer"
                   onClick={() => setOpenedPost(post)}
                 >
                   <button
@@ -1369,16 +1900,10 @@ const Postt = () => {
                     <img
                       src={post.image}
                       alt={post.title || "Post Image"}
-                      style={{
-                        width: "100%",
-                        height: "180px",
-                        objectFit: "cover",
-                        borderTopLeftRadius: "12px",
-                        borderTopRightRadius: "12px",
-                      }}
+                      className="w-full h-[180px] object-cover"
                     />
                   ) : (
-                    <div style={{ width: '100%', height: '180px', background: 'linear-gradient(to right, #cce5ff, #d5d5ff)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '2rem', fontWeight: 'bold' }}>
+                    <div className="w-full h-[180px] bg-gradient-to-r from-blue-200 to-indigo-300 flex items-center justify-center text-white text-3xl font-bold">
                       {post.title?.charAt(0)?.toUpperCase() || "P"}
                     </div>
                   )}
@@ -1395,13 +1920,14 @@ const Postt = () => {
                     <p className="text-gray-600 text-sm mb-3 line-clamp-2">
                       {post.content.substring(0, 100)}...
                     </p>
+
                     <div className="mt-auto flex items-center justify-between text-xs text-gray-500">
                       <div className="flex items-center gap-2">
-                        {post.author?.avatar ? (
+                        {post.author?.profilePicture ? (
                           <img
-                            src={post.author.avatar}
+                            src={post.author.profilePicture}
                             alt="author"
-                            style={{ width: 24, height: 24, borderRadius: '50%', objectFit: 'cover' }}
+                            className="w-6 h-6 rounded-full object-cover"
                           />
                         ) : (
                           <div className="bg-gradient-to-r from-blue-500 to-purple-500 text-white w-6 h-6 rounded-full flex items-center justify-center font-medium">
@@ -1415,6 +1941,19 @@ const Postt = () => {
                         <span>{new Date(post.createdAt).toLocaleDateString()}</span>
                       </div>
                     </div>
+
+                    <div className="mt-3 flex items-center justify-between text-gray-600 text-sm px-1">
+                      <button
+                        className="flex items-center gap-1 hover:text-red-500 transition"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          likePost(post._id);
+                        }}
+                      >
+                        <Heart size={18} className="transition-transform duration-200 hover:scale-110" />
+                        <span>{post.likes?.length || 0}</span>
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))
@@ -1426,8 +1965,18 @@ const Postt = () => {
               </div>
             )}
           </div>
+        
+
+       
+          <Whyus/>
+               <CounterThree />
+                 <LandingPage/>
+                 <NepaliNews/>
         </>
       )}
+      {!openedPost && <ContactForm />}
+
+
     </div>
   );
 };

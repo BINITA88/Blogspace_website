@@ -10,6 +10,8 @@ import postRoutes from "./routes/post.route.js";
 import notificationRoutes from "./routes/notification.route.js";
 import connectionRoutes from "./routes/connection.route.js";
 import chatRoutes from "./routes/chatRoutes.js";
+
+
 // import messageRoutes from "./routes/messageRoutes.js";
 import { Server } from "socket.io";
 import { connectDB } from "./lib/db.js";
@@ -41,6 +43,7 @@ app.use("/api/v1/posts", postRoutes);
 app.use("/api/v1/notifications", notificationRoutes);
 app.use("/api/v1/connections", connectionRoutes);
 app.use("/api/v1/chat", chatRoutes);
+
 // app.use("/api/v1/messages", messageRoutes);
 
 // Serve frontend in production
@@ -197,6 +200,237 @@ server.listen(PORT, () => {
 	console.log(`📱 Frontend should connect to: http://localhost:${PORT}`);
 	console.log(`📊 Stats available at: http://localhost:${PORT}/api/stats`);
 });
+
+
+
+
+
+// import express from "express";
+// import dotenv from "dotenv";
+// import cookieParser from "cookie-parser";
+// import cors from "cors";
+// import path from "path";
+// import http from "http";
+
+// import authRoutes from "./routes/auth.route.js";
+// import userRoutes from "./routes/user.route.js";
+// import postRoutes from "./routes/post.route.js";
+// import notificationRoutes from "./routes/notification.route.js";
+// import connectionRoutes from "./routes/connection.route.js";
+// import chatRoutes from "./routes/chatRoutes.js";
+
+// import { Server } from "socket.io";
+// import { connectDB } from "./lib/db.js";
+
+// import BlogPost from "./models/BlogPost.js";
+// import { scrapeAndSaveHamroPatraBlogs } from "./controllers/scrapeHamroPatra.js";
+
+// dotenv.config();
+
+// const app = express();
+// const PORT = process.env.PORT || 5000;
+// const __dirname = path.resolve();
+
+// // CORS Setup
+// if (process.env.NODE_ENV !== "production") {
+// 	app.use(
+// 		cors({
+// 			origin: "http://localhost:5173",
+// 			credentials: true,
+// 		})
+// 	);
+// }
+
+// // Middleware
+// app.use(express.json({ limit: "5mb" }));
+// app.use(cookieParser());
+
+// // API Routes
+// app.use("/api/v1/auth", authRoutes);
+// app.use("/api/v1/users", userRoutes);
+// app.use("/api/v1/posts", postRoutes);
+// app.use("/api/v1/notifications", notificationRoutes);
+// app.use("/api/v1/connections", connectionRoutes);
+// app.use("/api/v1/chat", chatRoutes);
+
+// // ==== Add HamroPatra scraping API routes here ====
+
+// // Get scraped posts from DB
+// app.get("/api/v1/hamropatra-blogs", async (req, res) => {
+// 	try {
+// 		const posts = await BlogPost.find().sort({ createdAt: -1 }).limit(20);
+// 		res.json(posts);
+// 	} catch (error) {
+// 		res.status(500).json({ error: "Failed to fetch posts" });
+// 	}
+// });
+
+// // Trigger scraping manually (admin)
+// app.get("/api/v1/admin/scrape", async (req, res) => {
+// 	try {
+// 		await scrapeAndSaveHamroPatraBlogs();
+// 		res.json({ message: "Scraping triggered" });
+// 	} catch (error) {
+// 		res.status(500).json({ error: "Scraping failed" });
+// 	}
+// });
+
+// // Serve frontend in production
+// if (process.env.NODE_ENV === "production") {
+// 	app.use(express.static(path.join(__dirname, "/frontend/dist")));
+
+// 	app.get("*", (req, res) => {
+// 		res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"));
+// 	});
+// }
+
+// // HTTP server and Socket.IO setup
+// const server = http.createServer(app);
+// const io = new Server(server, {
+// 	cors: {
+// 		origin: "http://localhost:5173",
+// 		methods: ["GET", "POST"],
+// 		credentials: true,
+// 	},
+// });
+
+// // Socket.IO logic
+// let users = {}; // socketId -> username
+// let userSockets = {}; // username -> socketId
+// let privateMessages = {}; // "user1-user2" -> [messages]
+
+// function createChatKey(user1, user2) {
+// 	return [user1, user2].sort().join("-");
+// }
+
+// io.on("connection", (socket) => {
+// 	console.log("User connected:", socket.id);
+
+// 	socket.on("join", (username) => {
+// 		users[socket.id] = username;
+// 		userSockets[username] = socket.id;
+// 		socket.broadcast.emit("userConnected", username);
+// 		io.emit("userList", Object.values(users));
+// 		console.log(`${username} joined the chat`);
+// 	});
+
+// 	socket.on("privateMessage", ({ recipient, text, timestamp }) => {
+// 		const sender = users[socket.id];
+// 		if (!sender) return;
+
+// 		const message = {
+// 			id: Date.now() + Math.random(),
+// 			sender,
+// 			recipient,
+// 			text,
+// 			timestamp:
+// 				timestamp || new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+// 		};
+
+// 		const chatKey = createChatKey(sender, recipient);
+// 		if (!privateMessages[chatKey]) privateMessages[chatKey] = [];
+// 		privateMessages[chatKey].push(message);
+
+// 		const recipientSocketId = userSockets[recipient];
+// 		if (recipientSocketId) io.to(recipientSocketId).emit("privateMessage", message);
+// 		socket.emit("privateMessage", message);
+
+// 		console.log(`Private message from ${sender} to ${recipient}: ${text}`);
+// 	});
+
+// 	socket.on("getMessages", ({ user1, user2 }) => {
+// 		const chatKey = createChatKey(user1, user2);
+// 		const messages = privateMessages[chatKey] || [];
+// 		socket.emit("loadMessages", messages);
+// 		console.log(`Loaded ${messages.length} messages for ${user1} and ${user2}`);
+// 	});
+
+// 	socket.on("initiateVideoCall", ({ recipient }) => {
+// 		const caller = users[socket.id];
+// 		const recipientSocketId = userSockets[recipient];
+// 		if (recipientSocketId) {
+// 			io.to(recipientSocketId).emit("incomingVideoCall", { caller, callType: "video" });
+// 			console.log(`Video call from ${caller} to ${recipient}`);
+// 		}
+// 	});
+
+// 	socket.on("initiateVoiceCall", ({ recipient }) => {
+// 		const caller = users[socket.id];
+// 		const recipientSocketId = userSockets[recipient];
+// 		if (recipientSocketId) {
+// 			io.to(recipientSocketId).emit("incomingVoiceCall", { caller, callType: "voice" });
+// 			console.log(`Voice call from ${caller} to ${recipient}`);
+// 		}
+// 	});
+
+// 	socket.on("callResponse", ({ caller, accepted, callType }) => {
+// 		const responder = users[socket.id];
+// 		const callerSocketId = userSockets[caller];
+// 		if (callerSocketId) {
+// 			io.to(callerSocketId).emit("callResponse", { responder, accepted, callType });
+// 			console.log(`Call ${accepted ? "accepted" : "rejected"} by ${responder}`);
+// 		}
+// 	});
+
+// 	socket.on("endCall", ({ otherUser }) => {
+// 		const user = users[socket.id];
+// 		const otherUserSocketId = userSockets[otherUser];
+// 		if (otherUserSocketId) {
+// 			io.to(otherUserSocketId).emit("callEnded", { user });
+// 			console.log(`Call ended between ${user} and ${otherUser}`);
+// 		}
+// 	});
+
+// 	socket.on("typing", ({ recipient, isTyping }) => {
+// 		const sender = users[socket.id];
+// 		const recipientSocketId = userSockets[recipient];
+// 		if (recipientSocketId) {
+// 			io.to(recipientSocketId).emit("userTyping", { user: sender, isTyping });
+// 		}
+// 	});
+
+// 	socket.on("disconnect", () => {
+// 		const username = users[socket.id];
+// 		if (username) {
+// 			console.log("User disconnected:", username);
+// 			delete users[socket.id];
+// 			delete userSockets[username];
+// 			socket.broadcast.emit("userDisconnected", username);
+// 			io.emit("userList", Object.values(users));
+// 		}
+// 	});
+
+// 	socket.on("getUserList", () => {
+// 		socket.emit("userList", Object.values(users));
+// 	});
+// });
+
+// // Health check route
+// app.get("/", (req, res) => {
+// 	res.json({
+// 		message: "Chat server is running!",
+// 		connectedUsers: Object.keys(users).length,
+// 		totalChats: Object.keys(privateMessages).length,
+// 	});
+// });
+
+// // API for chat stats
+// app.get("/api/stats", (req, res) => {
+// 	res.json({
+// 		connectedUsers: Object.values(users),
+// 		totalChats: Object.keys(privateMessages).length,
+// 		totalMessages: Object.values(privateMessages).reduce((sum, arr) => sum + arr.length, 0),
+// 	});
+// });
+
+// // Connect to MongoDB and start the server
+// connectDB().then(() => {
+// 	server.listen(PORT, () => {
+// 		console.log(`🚀 Chat server is running on port ${PORT}`);
+// 		console.log(`📱 Frontend should connect to: http://localhost:${PORT}`);
+// 		console.log(`📊 Stats available at: http://localhost:${PORT}/api/stats`);
+// 	});
+// });
 
 
 // const express = require('express');

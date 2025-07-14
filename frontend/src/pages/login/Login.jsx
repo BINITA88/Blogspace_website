@@ -264,22 +264,23 @@ const Login = () => {
                       </Checkbox>
                     </Col>
                     <Col>
-                      <Button
-                        type="link"
-                        onClick={() => setIsModalVisible(true)}
-                      >
-                        Forgot password?
-                      </Button>
+<Button
+  type="link"
+  onClick={() => setIsModalVisible(true)}
+  className="text-[#159A9C] hover:text-[#128a8c]"
+>
+  Forgot password?
+</Button>
+
                     </Col>
                   </Row>
                   <Form.Item style={{ marginTop: 24 }}>
                     <Button
-                      type="primary"
                       htmlType="submit"
                       block
                       size="large"
                       style={{
-                        background: "#1B4277",
+                        background: "#159A9C",
                       }}
                     >
                       Login

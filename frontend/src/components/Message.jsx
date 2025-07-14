@@ -620,74 +620,106 @@
 // }
 
 // export default Messenge;
-
-import React, { useState, useEffect, useRef } from 'react';
-import axios from 'axios';
-import io from 'socket.io-client';
-import { Search, LogOut, Send, MessageCircle } from 'lucide-react';
+import React, { useState, useEffect, useRef } from "react";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
+import io from "socket.io-client";
+import { Search, LogOut, Send, MessageCircle } from "lucide-react";
 
 let socket;
 
 function Messenge() {
-  const [username, setUsername] = useState('');
+  const {
+    data: authUser,
+    isLoading: authLoading,
+    error: authError,
+  } = useQuery({
+    queryKey: ["authUser"],
+    queryFn: () =>
+      axios
+        .get("http://localhost:5000/api/v1/auth/me", { withCredentials: true })
+        .then((res) => res.data),
+  });
+
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [messages, setMessages] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [message, setMessage] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [message, setMessage] = useState("");
   const [typingUsers, setTypingUsers] = useState(new Set());
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef(null);
   const typingTimeoutRef = useRef(null);
 
   const getRandomEmoji = () => {
-    const emojis = ['😀', '😃', '😂', '🥳', '😎', '😉', '😁', '😇', '😊', '🤓'];
+    const emojis = [
+      "😀",
+      "😃",
+      "😂",
+      "🥳",
+      "😎",
+      "😉",
+      "😁",
+      "😇",
+      "😊",
+      "🤓",
+    ];
     return emojis[Math.floor(Math.random() * emojis.length)];
   };
 
   useEffect(() => {
-    axios.get('http://localhost:5000/api/v1/auth/me', { withCredentials: true })
-      .then(res => setUsername(res.data.username))
-      .catch(err => console.error('Error fetching user:', err));
-  }, []);
+    if (!authUser || authLoading) return;
 
-  useEffect(() => {
-    if (!username) return;
+    const username = authUser.username;
 
-    socket = io('http://localhost:5000', {
-      transports: ['websocket'],
+    socket = io("http://localhost:5000", {
+      transports: ["websocket"],
       withCredentials: true,
     });
 
-    socket.emit('join', username);
+    socket.emit("join", username);
 
-    axios.get('http://localhost:5000/api/v1/auth/userlist', { withCredentials: true })
-      .then(res => {
+    axios
+      .get("http://localhost:5000/api/v1/auth/userlist", {
+        withCredentials: true,
+      })
+      .then((res) => {
         const filtered = res.data
-          .filter(user => user.username !== username)
-          .map(user => ({ name: user.username, id: user.id, status: 'offline' }));
+          .filter((user) => user.username !== username)
+          .map((user) => ({
+            name: user.username,
+            id: user.id,
+            status: "offline",
+            profilePicture: user.profilePicture || null,
+          }));
         setUsers(filtered);
       });
 
-    socket.on('userConnected', user =>
-      setUsers(prev => prev.map(u => u.name === user ? { ...u, status: 'online' } : u)));
+    socket.on("userConnected", (user) =>
+      setUsers((prev) =>
+        prev.map((u) => (u.name === user ? { ...u, status: "online" } : u))
+      )
+    );
 
-    socket.on('userDisconnected', user =>
-      setUsers(prev => prev.map(u => u.name === user ? { ...u, status: 'offline' } : u)));
+    socket.on("userDisconnected", (user) =>
+      setUsers((prev) =>
+        prev.map((u) => (u.name === user ? { ...u, status: "offline" } : u))
+      )
+    );
 
-    socket.on('privateMessage', msg => {
+    socket.on("privateMessage", (msg) => {
       if (
         selectedUser &&
         ((msg.sender === username && msg.recipient === selectedUser.name) ||
           (msg.sender === selectedUser.name && msg.recipient === username))
       ) {
-        setMessages(prev => [...prev, msg]);
+        setMessages((prev) => [...prev, msg]);
       }
     });
 
-    socket.on('userTyping', data => {
+    socket.on("userTyping", (data) => {
       if (selectedUser && data.user === selectedUser.name) {
-        setTypingUsers(prev => {
+        setTypingUsers((prev) => {
           const newSet = new Set(prev);
           data.isTyping ? newSet.add(data.user) : newSet.delete(data.user);
           return newSet;
@@ -699,7 +731,7 @@ function Messenge() {
       socket.disconnect();
       socket = null;
     };
-  }, [username, selectedUser]);
+  }, [authUser, authLoading, selectedUser]);
 
   const handleUserSelect = (user) => {
     setSelectedUser(user);
@@ -707,16 +739,16 @@ function Messenge() {
     setTypingUsers(new Set());
 
     if (socket) {
-      socket.emit('getMessages', { user1: username, user2: user.name });
+      socket.emit("getMessages", { user1: authUser.username, user2: user.name });
 
       const handleLoadMessages = (loadedMessages) => {
         setMessages(loadedMessages);
       };
 
-      socket.on('loadMessages', handleLoadMessages);
+      socket.on("loadMessages", handleLoadMessages);
 
       return () => {
-        socket.off('loadMessages', handleLoadMessages);
+        socket.off("loadMessages", handleLoadMessages);
       };
     }
   };
@@ -726,12 +758,16 @@ function Messenge() {
     if (!message.trim() || !socket || !selectedUser) return;
 
     const msgData = {
+      sender: authUser.username,
       recipient: selectedUser.name,
       text: message.trim(),
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      timestamp: new Date().toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
     };
-    socket.emit('privateMessage', msgData);
-    setMessage('');
+    socket.emit("privateMessage", msgData);
+    setMessage("");
     handleTypingStop();
   };
 
@@ -740,7 +776,7 @@ function Messenge() {
     if (selectedUser && socket) {
       if (!isTyping) {
         setIsTyping(true);
-        socket.emit('typing', { recipient: selectedUser.name, isTyping: true });
+        socket.emit("typing", { recipient: selectedUser.name, isTyping: true });
       }
       if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
       typingTimeoutRef.current = setTimeout(() => handleTypingStop(), 1000);
@@ -750,41 +786,66 @@ function Messenge() {
   const handleTypingStop = () => {
     if (isTyping && selectedUser && socket) {
       setIsTyping(false);
-      socket.emit('typing', { recipient: selectedUser.name, isTyping: false });
+      socket.emit("typing", { recipient: selectedUser.name, isTyping: false });
     }
     if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
   };
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const filteredUsers = users.filter(user =>
+  const filteredUsers = users.filter((user) =>
     user.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const handleLogout = () => {
     socket?.disconnect();
-    setUsername('');
-    setUsers([]);
     setSelectedUser(null);
     setMessages([]);
     setTypingUsers(new Set());
   };
 
+  if (authLoading) {
+    return (
+      <div className="h-screen flex items-center justify-center">Loading user info...</div>
+    );
+  }
+
+  if (authError) {
+    return (
+      <div className="h-screen flex items-center justify-center text-red-600">
+        Error loading user info
+      </div>
+    );
+  }
+
   return (
     <div className="h-screen flex bg-gray-50">
-      <div className="w-1/3 border-r flex flex-col bg-white">
+      {/* Sidebar */}
+      <div className="w-1/3 flex flex-col bg-white border-r">
         <div className="p-4 border-b">
           <div className="flex justify-between items-center mb-4">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-green-500 rounded-full text-white flex items-center justify-center">
-                {username.charAt(0).toUpperCase()}
-              </div>
-              <span>{username}</span>
+              {authUser.profilePicture ? (
+                <img
+                  src={authUser.profilePicture}
+                  alt={authUser.username}
+                  className="w-10 h-10 rounded-full object-cover"
+                />
+              ) : (
+                <div className="w-10 h-10 bg-[#159A9C] rounded-full text-white flex items-center justify-center text-lg font-semibold">
+                  {authUser.username.charAt(0).toUpperCase()}
+                </div>
+              )}
+              <span className="text-[#159A9C] font-semibold">{authUser.username}</span>
             </div>
-            <button onClick={handleLogout} title="Logout" className="p-2 hover:bg-gray-200 rounded-full">
-              <LogOut className="w-5 h-5 text-gray-500" />
+            <button
+              onClick={handleLogout}
+              title="Logout"
+              className="p-2 hover:bg-[#ABE8E8] rounded-full transition"
+            >
+              <LogOut className="w-5 h-5 text-[#159A9C]" />
             </button>
           </div>
           <div className="relative">
@@ -792,62 +853,101 @@ function Messenge() {
             <input
               type="text"
               placeholder="Search users..."
-              className="pl-10 pr-4 py-2 border rounded-lg w-full bg-gray-100 focus:ring-2 focus:ring-green-500"
+              className="pl-10 pr-4 py-2 border rounded-lg w-full bg-gray-100 focus:ring-2 focus:ring-[#159A9C]"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
         </div>
+
+        {/* User list */}
         <div className="flex-1 overflow-y-auto">
           {filteredUsers.map((user, idx) => (
             <div
               key={idx}
               onClick={() => handleUserSelect(user)}
-              className={`p-4 border-b cursor-pointer hover:bg-gray-50 ${
-                selectedUser?.name === user.name ? 'bg-green-50' : ''
-              }`}
+              className={`p-4 cursor-pointer flex items-center space-x-3 transition rounded-r-lg
+                ${
+                  selectedUser?.name === user.name
+                    ? "bg-[#ABE8E8] text-[#159A9C]"
+                    : "text-[#159A9C] hover:bg-[#ABE8E8]"
+                }
+              `}
             >
-              <div className="flex items-center space-x-3">
-                <div className="w-12 h-12 bg-blue-500 rounded-full text-white flex items-center justify-center relative">
+              {user.profilePicture ? (
+                <img
+                  src={user.profilePicture}
+                  alt={user.name}
+                  className={`w-12 h-12 rounded-full object-cover ring-2 ring-[#159A9C]`}
+                />
+              ) : (
+                <div
+                  className={`w-12 h-12 rounded-full flex items-center justify-center font-semibold text-xl select-none bg-[#159A9C] text-white`}
+                >
                   {user.name.charAt(0).toUpperCase()}
-                  <span className="absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white
-                    ${user.status === 'online' ? 'bg-green-400' : 'bg-gray-400'}" />
                 </div>
-                <div className="flex-1">
-                  <div className="flex justify-between items-center">
-                    <h3>{user.name}</h3>
-                    <span className="text-xl">{getRandomEmoji()}</span>
-                  </div>
-                  <p className="text-sm text-gray-600">{user.status}</p>
+              )}
+              <div className="flex-1">
+                <div className="flex justify-between items-center">
+                  <h3 className="font-semibold">{user.name}</h3>
+                  <span className="text-2xl select-none">{getRandomEmoji()}</span>
                 </div>
+                <p className={`text-sm ${selectedUser?.name === user.name ? "text-[#159A9C]" : "text-[#4C8A8A]"}`}>
+                  {user.status === "online" ? "Online" : "Offline"}
+                </p>
               </div>
             </div>
           ))}
         </div>
       </div>
 
+      {/* Chat Area */}
       <div className="flex-1 flex flex-col">
         {selectedUser ? (
           <>
             <div className="p-4 border-b bg-white">
               <div className="flex space-x-3 items-center">
-                <div className="w-10 h-10 bg-blue-500 rounded-full text-white flex items-center justify-center">
-                  {selectedUser.name.charAt(0).toUpperCase()}
-                </div>
+                {selectedUser.profilePicture ? (
+                  <img
+                    src={selectedUser.profilePicture}
+                    alt={selectedUser.name}
+                    className="w-10 h-10 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="w-10 h-10 bg-[#159A9C] rounded-full flex items-center justify-center text-white font-semibold text-lg">
+                    {selectedUser.name.charAt(0).toUpperCase()}
+                  </div>
+                )}
                 <div>
-                  <h2>{selectedUser.name}</h2>
+                  <h2 className="text-[#159A9C] font-semibold">{selectedUser.name}</h2>
                   <p className="text-sm text-green-500">{selectedUser.status}</p>
                 </div>
               </div>
             </div>
+
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
               {messages.map((msg, i) => (
-                <div key={i} className={`flex ${msg.sender === username ? 'justify-end' : 'justify-start'}`}>
-                  <div className={`px-4 py-2 rounded-lg max-w-xs lg:max-w-md ${
-                    msg.sender === username ? 'bg-green-500 text-white' : 'bg-white text-gray-800 shadow-sm'
-                  }`}>
+                <div
+                  key={i}
+                  className={`flex ${
+                    msg.sender === authUser.username ? "justify-end" : "justify-start"
+                  }`}
+                >
+                  <div
+                    className={`px-4 py-2 rounded-lg max-w-xs lg:max-w-md ${
+                      msg.sender === authUser.username
+                        ? "bg-[#159A9C] text-white"
+                        : "bg-white text-gray-800 shadow-sm"
+                    }`}
+                  >
                     <p className="text-sm">{msg.text}</p>
-                    <p className={`text-xs mt-1 ${msg.sender === username ? 'text-green-100' : 'text-gray-500'}`}>
+                    <p
+                      className={`text-xs mt-1 ${
+                        msg.sender === authUser.username
+                          ? "text-[#ABE8E8]"
+                          : "text-gray-500"
+                      }`}
+                    >
                       {msg.timestamp}
                     </p>
                   </div>
@@ -855,11 +955,13 @@ function Messenge() {
               ))}
               {typingUsers.size > 0 && (
                 <div className="bg-gray-200 px-4 py-2 rounded-lg text-sm text-gray-600">
-                  {Array.from(typingUsers).join(', ')} {typingUsers.size === 1 ? 'is' : 'are'} typing...
+                  {Array.from(typingUsers).join(", ")}{" "}
+                  {typingUsers.size === 1 ? "is" : "are"} typing...
                 </div>
               )}
               <div ref={messagesEndRef} />
             </div>
+
             <div className="p-4 border-t bg-white">
               <form onSubmit={handleSendMessage} className="flex items-center space-x-2">
                 <input
@@ -867,12 +969,12 @@ function Messenge() {
                   placeholder={`Message ${selectedUser.name}...`}
                   value={message}
                   onChange={handleTyping}
-                  className="flex-1 px-4 py-2 border rounded-full focus:ring-2 focus:ring-green-500"
+                  className="flex-1 px-4 py-2 border rounded-full focus:ring-2 focus:ring-[#159A9C]"
                 />
                 <button
                   type="submit"
                   disabled={!message.trim()}
-                  className="bg-green-500 p-2 text-white rounded-full hover:bg-green-600 disabled:bg-gray-300"
+                  className="bg-[#159A9C] p-2 text-white rounded-full hover:bg-[#0f7a7c] disabled:bg-gray-300 transition"
                 >
                   <Send className="w-5 h-5" />
                 </button>
@@ -894,6 +996,7 @@ function Messenge() {
 }
 
 export default Messenge;
+
 
 
 // import React, { useState, useEffect, useRef } from 'react';

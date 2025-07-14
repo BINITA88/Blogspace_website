@@ -1,24 +1,35 @@
 import { useState } from "react";
-import contactImage from "../assets/imgg/image.png";
+import axios from "axios";
+import contactImage from "../assets/imgg/contactus.png";
+import { axiosInstance } from "../lib/axios";
 
 const ContactForm = () => {
   const [formData, setFormData] = useState({ name: "", email: "", message: "" });
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState(null);
 
   const handleChange = (e) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Form submitted:", formData);
-    setSubmitted(true);
-    setFormData({ name: "", email: "", message: "" });
-    setTimeout(() => setSubmitted(false), 3000);
+    setError(null);
+
+    try {
+      const response = await axiosInstance.post("/connections/", formData);
+      console.log("✅ Message sent:", response.data);
+      setSubmitted(true);
+      setFormData({ name: "", email: "", message: "" });
+      setTimeout(() => setSubmitted(false), 3000);
+    } catch (err) {
+      console.error("❌ Error submitting form:", err);
+      setError("Something went wrong. Please try again.");
+    }
   };
 
   return (
-    <section className="bg-white py-12 border-t border-b border-gray-300">
+    <section className="bg-white  py-12">
       <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
 
         {/* Contact Image */}
@@ -26,13 +37,13 @@ const ContactForm = () => {
           <img
             src={contactImage}
             alt="Contact Us"
-            className="w-full max-w-md h-auto object-contain" // image max width about 320px (md = 28rem)
+            className="w-full max-w-[550px] h-auto object-contain"
           />
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-4 max-w-md w-full text-base"> 
-          <h2 className="text-lg font-semibold text-gray-800 mb-2">Contact Us</h2>
+        <form onSubmit={handleSubmit} className="space-y-4 max-w-md w-full text-base">
+          <h2 className="text-3xl font-semibold text-gray-800 mb-2">Get In Touch</h2>
 
           <input
             type="text"
@@ -66,13 +77,17 @@ const ContactForm = () => {
 
           <button
             type="submit"
-            className="bg-[#1CA59A] text-white px-6 py-2 rounded hover:bg-[#16897A]"
+            className="bg-[#269092] text-white px-6 py-2 rounded hover:bg-[#16897A]"
           >
             Send Message
           </button>
 
           {submitted && (
             <p className="text-green-600 text-sm mt-2">Your message has been sent!</p>
+          )}
+
+          {error && (
+            <p className="text-red-500 text-sm mt-2">{error}</p>
           )}
         </form>
       </div>

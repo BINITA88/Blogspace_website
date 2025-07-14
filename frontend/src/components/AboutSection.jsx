@@ -23,7 +23,7 @@ const AboutSection = ({ userData, isOwnProfile, onSave }) => {
 							/>
 							<button
 								onClick={handleSave}
-								className='mt-2 bg-primary text-white py-2 px-4 rounded hover:bg-primary-dark 
+	  style={{ backgroundColor: '#159A9C' }}							className='mt-2  text-white py-2 px-4 rounded hover:bg-primary-dark 
 								transition duration-300'
 							>
 								Save

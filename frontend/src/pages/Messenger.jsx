@@ -23,12 +23,11 @@ const Messenger = () => {
     },
   });
 
-  // If the user is already selected, don't fetch again
-  useEffect(() => {
-    if (selectedUser) {
-      setSelectedUserForChat(selectedUser); // If already selected user, set it.
-    }
-  }, [selectedUser]);
+useEffect(() => {
+  if (!selectedUserForChat && users.length > 0) {
+    setSelectedUserForChat(users[0]);
+  }
+}, [users, selectedUserForChat]);
 
   useEffect(() => {
     if (sharedPost && !isPostShared) {

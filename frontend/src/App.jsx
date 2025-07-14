@@ -1,6 +1,5 @@
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import Layout from "./components/layout/Layout";
-
 import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/auth/LoginPage";
 import SignUpPage from "./pages/auth/SignUpPage";
@@ -11,17 +10,35 @@ import NotificationsPage from "./pages/NotificationsPage";
 import NetworkPage from "./pages/NetworkPage";
 import PostPage from "./pages/PostPage";
 import ProfilePage from "./pages/ProfilePage";
-import Post from "./components/Post";
 import Postt from "./pages/Post";
-import Home from "./pages/Home";
 import SavedPosts from "./pages/SavedPosts";
-import Messenger from "./pages/Messenger";
 import ResetPassword from "./pages/auth/ResetPassword";
 import ForgetPassword from "./pages/auth/ForgetPassword";
-// import ChatSidebar from "./components/chat/ChatSidebar";
-// import Chat from "./pages/chat/Chat";
+import AdminDashboard from "./pages/auth/AdminDashboardPage";
+import Message from "./components/Message";
+
+import { useEffect, useState } from "react";
+import Preloader from "./components/Preloader/Preloader";
+import Webscrapping from "./components/webscrapping";
+import ArticleDetail from "./pages/BlogDetail";
+// import SummarizeAndFeed from "./pages/SummarizeAndFeed";
+// import HamroPatraBlogs from "./pages/HamroPatraBlogs";
 
 function App() {
+	const location = useLocation();
+	const [showPreloader, setShowPreloader] = useState(true);
+
+	// Show preloader on route change
+	useEffect(() => {
+		setShowPreloader(true);
+		const timer = setTimeout(() => {
+			setShowPreloader(false);
+		}, 800); // Preloader visible for 800ms
+
+		return () => clearTimeout(timer);
+	}, [location]);
+
+	// Fetch user
 	const { data: authUser, isLoading } = useQuery({
 		queryKey: ["authUser"],
 		queryFn: async () => {
@@ -37,34 +54,41 @@ function App() {
 		},
 	});
 
-	if (isLoading) return null;
+	// if (isLoading || showPreloader) return < Preloader/>;
+
+	const isAdminRoute = location.pathname === "/dash";
+
+	const routes = (
+		<Routes>
+			
+			<Route path='/postt' element={authUser ? <HomePage /> : <Navigate to={"/login"} />} />
+			<Route path='/signup' element={<SignUpPage />} />
+			<Route path='/login' element={!authUser ? <LoginPage /> : <Navigate to={"/"} />} />
+			<Route path='/notifications' element={authUser ? <NotificationsPage /> : <Navigate to={"/login"} />} />
+			<Route path='/network' element={authUser ? <NetworkPage /> : <Navigate to={"/login"} />} />
+			<Route path='/profile/:username' element={authUser ? <ProfilePage /> : <Navigate to={"/login"} />} />
+			<Route path='/post/:postId' element={authUser ? <PostPage /> : <Navigate to={"/login"} />} />
+			<Route path="/blog/:id" element={<ArticleDetail /> } />
+
+			<Route path='/' element={authUser ? <Postt /> : <Navigate to={"/login"} />} />
+            <Route path="/messenger" element={<Message />} />
+			<Route path='/saved-posts' element={<SavedPosts />} />
+			<Route path='/resetpassword/:token' element={<ResetPassword />} />
+			<Route path='/dash' element={authUser ? <AdminDashboard /> : <Navigate to="/login" />} />
+			<Route path='/forgot' element={<ForgetPassword />} />
+			{/* <Route path="/summarize" element={<SummarizeAndFeed />} />
+			<Route path="/hamropatra" element={<HamroPatraBlogs />} /> */}
+		</Routes>
+	);
 
 	return (
-		<Layout>
-			<Routes>
-				<Route path='/' element={authUser ? <HomePage /> : <Navigate to={"/login"} />} />
-				<Route path='/signup' element={!authUser ? <SignUpPage /> : <Navigate to={"/"} />} />
-				<Route path='/login' element={!authUser ? <LoginPage /> : <Navigate to={"/"} />} />
-				<Route path='/notifications' element={authUser ? <NotificationsPage /> : <Navigate to={"/login"} />} />
-				<Route path='/network' element={authUser ? <NetworkPage /> : <Navigate to={"/login"} />} />
-				{/* <Route path='/post/:postId' element={authUser ? <PostPage /> : <Navigate to={"/login"} />} /> */}
-				<Route path='/profile/:username' element={authUser ? <ProfilePage /> : <Navigate to={"/login"} />} />
-				{/* <Route path='/postt' element={authUser ? <Postt /> : <Navigate to={"/login"} />} /> */}
-				<Route path="/post/:postId" element={authUser ? <PostPage /> : <Navigate to={"/login"} />} /> {/* Route for post description */}
-                <Route path="/postt" element={authUser ? <Postt /> : <Navigate to={"/login"} />} />  {/* Route for post listing */}
-				{/* <Route path="/messages" element={authUser ? <ChatSidebar /> : <Navigate to={"/login"} />}/> */}
-				<Route path='/messenger' element={<Home/>} />  
-				<Route path="/saved-posts" element={<SavedPosts />} />
-                <Route path="/messenger" element={<Messenger />} />
-			   <Route path="/resetpassword/:token" element={<ResetPassword />} />
-               <Route path='/forgot' element={<ForgetPassword/>}/>
-
-
-			</Routes>
+		<>
+			{isAdminRoute ? routes : <Layout>{routes}</Layout>}
 			<Toaster />
-		</Layout>
+		</>
 	);
 }
+
 
 
 // import React, { useState, useEffect, useRef } from 'react';

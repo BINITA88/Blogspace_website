@@ -309,24 +309,26 @@ const PostCreation = ({ user }) => {
             <span className='text-xs text-gray-500'>Ready to post</span>
           )}
 
-          <button
-            className={`px-6 py-2.5 rounded-lg font-medium transition-all duration-200 flex items-center space-x-2 ${
-              canPost && !isPending
-                ? "bg-blue-600 hover:bg-blue-700 text-white shadow-sm hover:shadow-md"
-                : "bg-gray-200 text-gray-400 cursor-not-allowed"
-            }`}
-            onClick={handlePostCreation}
-            disabled={!canPost || isPending}
-          >
-            {isPending ? (
-              <>
-                <Loader className='w-4 h-4 animate-spin' />
-                <span>Publishing...</span>
-              </>
-            ) : (
-              <span>Publish Post</span>
-            )}
-          </button>
+        <button
+  style={canPost && !isPending ? { backgroundColor: '#159A9C' } : undefined}
+  className={`px-6 py-2.5 rounded-lg font-medium transition-all duration-200 flex items-center space-x-2 ${
+    canPost && !isPending
+      ? "text-white shadow-sm hover:shadow-md"
+      : "bg-gray-200 text-gray-400 cursor-not-allowed"
+  }`}
+  onClick={handlePostCreation}
+  disabled={!canPost || isPending}
+>
+  {isPending ? (
+    <>
+      <Loader className="w-4 h-4 animate-spin" />
+      <span>Publishing...</span>
+    </>
+  ) : (
+    <span>Publish Post</span>
+  )}
+</button>
+
         </div>
       </div>
     </div>

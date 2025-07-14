@@ -8,10 +8,15 @@ import {
 	rejectConnectionRequest,
 	removeConnection,
 	sendConnectionRequest,
+	submitContactForm,
+	getContactList
 } from "../controllers/connection.controller.js";
 
 const router = express.Router();
+router.post("/", submitContactForm);
 
+// GET: Fetch all contact submissions
+router.get("/list", getContactList);
 router.post("/request/:userId", protectRoute, sendConnectionRequest);
 router.put("/accept/:requestId", protectRoute, acceptConnectionRequest);
 router.put("/reject/:requestId", protectRoute, rejectConnectionRequest);

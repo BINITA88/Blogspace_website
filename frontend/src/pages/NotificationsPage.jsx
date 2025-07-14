@@ -223,11 +223,12 @@ const NotificationsPage = () => {
 	const renderNotificationIcon = (type) => {
 		switch (type) {
 			case "like":
-				return <ThumbsUp className="w-5 h-5 text-blue-500" />;
+				return <ThumbsUp className="w-5 h-5 text-red-800" />;
 			case "comment":
 				return <MessageSquare className="w-5 h-5 text-green-500" />;
 			case "connectionAccepted":
-				return <UserPlus className="w-5 h-5 text-purple-500" />;
+		return <UserPlus className="w-5 h-5" style={{ color: '#159A9C' }} />;
+
 			default:
 				return <Bell className="w-5 h-5 text-gray-500" />;
 		}
@@ -243,27 +244,35 @@ const NotificationsPage = () => {
 				);
 			case "comment":
 				return (
-					<span className="text-gray-700">
-						<Link 
-							to={`/profile/${notification.relatedUser.username}`} 
-							className="font-bold text-blue-600 hover:text-blue-800 transition-colors"
-						>
-							{notification.relatedUser.name}
-						</Link>{" "}
-						commented on your post
-					</span>
+			<span className="text-gray-700">
+  <Link
+    to={`/profile/${notification.relatedUser.username}`}
+    className="font-bold transition-colors"
+    style={{ color: '#159A9C' }}
+    onMouseOver={(e) => (e.currentTarget.style.color = '#107476')}
+    onMouseOut={(e) => (e.currentTarget.style.color = '#159A9C')}
+  >
+    {notification.relatedUser.name}
+  </Link>{" "}
+  commented on your post
+</span>
+
 				);
 			case "connectionAccepted":
 				return (
 					<span className="text-gray-700">
-						<Link 
-							to={`/profile/${notification.relatedUser.username}`} 
-							className="font-bold text-purple-600 hover:text-purple-800 transition-colors"
-						>
-							{notification.relatedUser.name}
-						</Link>{" "}
-						accepted your connection request
-					</span>
+  <Link
+    to={`/profile/${notification.relatedUser.username}`}
+    className="font-bold transition-colors"
+    style={{ color: '#159A9C' }}
+    onMouseOver={(e) => (e.currentTarget.style.color = '#107476')}
+    onMouseOut={(e) => (e.currentTarget.style.color = '#159A9C')}
+  >
+    {notification.relatedUser.name}
+  </Link>{" "}
+  accepted your connection request
+</span>
+
 				);
 			default:
 				return null;
@@ -351,9 +360,17 @@ const NotificationsPage = () => {
 						<div className="flex items-center justify-between">
 							<h2 className="text-xl font-bold text-gray-900">Recent Activity</h2>
 							<div className="flex items-center space-x-3">
-								<button className="text-sm text-blue-600 hover:text-blue-800 font-medium">
-									Mark all as read
-								</button>
+<button
+  className="text-sm font-medium transition duration-200"
+  style={{
+    color: '#159A9C'
+  }}
+  onMouseOver={e => e.currentTarget.style.color = '#107476'}
+  onMouseOut={e => e.currentTarget.style.color = '#159A9C'}
+>
+  Mark all as read
+</button>
+
 								<button className="text-sm text-gray-600 hover:text-gray-800 font-medium">
 									Clear all
 								</button>
@@ -378,9 +395,13 @@ const NotificationsPage = () => {
 												: "bg-gray-50 border-gray-200 hover:bg-white"
 										}`}
 									>
-										{!notification.read && (
-											<div className="absolute top-4 right-4 w-3 h-3 bg-blue-500 rounded-full animate-pulse"></div>
-										)}
+									{!notification.read && (
+  <div
+    className="absolute top-4 right-4 w-3 h-3 rounded-full animate-pulse"
+    style={{ backgroundColor: '#159A9C' }}
+  ></div>
+)}
+
 										
 										<div className="flex items-start space-x-4">
 											<Link 
@@ -415,14 +436,21 @@ const NotificationsPage = () => {
 
 											<div className="flex items-center space-x-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
 												{!notification.read && (
-													<button
-														onClick={() => markAsReadMutation(notification._id)}
-														className="p-2 bg-blue-100 text-blue-600 rounded-xl hover:bg-blue-200 transition-colors duration-200"
-														aria-label="Mark as read"
-													>
-														<Eye className="w-4 h-4" />
-													</button>
-												)}
+  <button
+    onClick={() => markAsReadMutation(notification._id)}
+    className="p-2 rounded-xl transition-colors duration-200"
+    style={{
+      backgroundColor: '#E0F7F8', // light version of #159A9C
+      color: '#159A9C'
+    }}
+    onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#C3EFF0'} // hover effect
+    onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#E0F7F8'}
+    aria-label="Mark as read"
+  >
+    <Eye className="w-4 h-4" />
+  </button>
+)}
+
 
 												<button
 													onClick={() => deleteNotificationMutation(notification._id)}
@@ -445,7 +473,10 @@ const NotificationsPage = () => {
 								<p className="text-gray-600 mb-8 max-w-md mx-auto text-lg">
 									You don't have any notifications at the moment. We'll notify you when there's new activity.
 								</p>
-								<button className="px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-medium hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 transform hover:scale-105 shadow-lg">
+								<button
+								
+									  style={{ backgroundColor: '#159A9C' }}
+									  className="px-8 py-3  text-white rounded-xl font-medium hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 transform hover:scale-105 shadow-lg">
 									Explore Network
 								</button>
 							</div>

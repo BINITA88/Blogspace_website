@@ -165,135 +165,271 @@
 
 
 
+// import React, { useState } from 'react';
+// import { useParams, useNavigate } from 'react-router-dom';
+
+// const ResetPassword = () => {
+//     const { token } = useParams();
+//     const navigate = useNavigate();
+//     const [password, setPassword] = useState('');
+//     const [confirmPassword, setConfirmPassword] = useState('');
+//     const [message, setMessage] = useState('');
+//     const [error, setError] = useState('');
+//     const [isLoading, setIsLoading] = useState(false);
+
+//     const handleSubmit = async (e) => {
+//         e.preventDefault();
+//         if (password !== confirmPassword) {
+//             setError('Passwords do not match');
+//             return;
+//         }
+//         setIsLoading(true);
+//         try {
+//             const response = await fetch(`http://localhost:5000/api/v1/users/resetpassword/${token}`, {
+//                 method: 'PUT',
+//                 headers: {
+//                     'Content-Type': 'application/json',
+//                 },
+//                 body: JSON.stringify({ password }),
+//             });
+//             const data = await response.json();
+//             if (response.ok) {
+//                 setError('');
+//                 setMessage('Password reset successfully. Redirecting to login page...');
+//                 setTimeout(() => {
+//                     navigate('/login');
+//                 }, 2000);
+//             } else {
+//                 setError(data.error || 'Failed to reset password.');
+//                 setMessage('');
+//             }
+//         } catch (error) {
+//             setError('An error occurred. Please try again.');
+//             setMessage('');
+//         }
+//         setIsLoading(false);
+//     };
+
+//     return (
+//         <div className="min-h-screen bg-gradient-to-br from-blue-50 via-blue-100 to-blue-200 flex items-center justify-center -mt-16 p-4">
+//             <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl p-8 relative overflow-hidden">
+//                 {/* Decorative Elements */}
+//                 <div className="absolute -top-4 -left-4 w-24 h-24 bg-blue-200 rounded-full opacity-50 blur-lg"></div>
+//                 <div className="absolute -bottom-4 -right-4 w-24 h-24 bg-blue-300 rounded-full opacity-50 blur-lg"></div>
+//                 <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-blue-100 to-transparent opacity-40 rounded-full transform translate-x-16 -translate-y-16"></div>
+
+//                 <div className="text-center mb-8 relative">
+//                     {/* Sparkles */}
+//                     <div className="absolute -top-2 left-12 text-blue-400 transform rotate-45">✦</div>
+//                     <div className="absolute top-6 right-16 text-blue-300 transform -rotate-12">✦</div>
+                    
+//                     {/* Main Icon */}
+//                     <div className="mx-auto w-20 h-20 bg-gradient-to-br from-blue-100 to-blue-200 rounded-2xl flex items-center justify-center mb-4 shadow-lg transform -rotate-3 hover:rotate-0 transition-transform duration-300">
+//                         <svg className="w-10 h-10 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+//                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+//                         </svg>
+//                     </div>
+
+//                     <h2 className="text-3xl font-bold text-gray-800 mb-2">
+//                         Reset Password
+//                     </h2>
+//                     <p className="text-gray-600 text-sm px-4">
+//                         Please enter your new password below
+//                     </p>
+//                 </div>
+
+//                 {message && (
+//                     <div className="mb-6 text-green-600 bg-green-50 border-2 border-green-200 p-4 rounded-xl flex items-center">
+//                         <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+//                             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+//                         </svg>
+//                         <span className="font-medium">{message}</span>
+//                     </div>
+//                 )}
+
+//                 {error && (
+//                     <div className="mb-6 text-red-600 bg-red-50 border-2 border-red-200 p-4 rounded-xl flex items-center">
+//                         <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+//                             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+//                         </svg>
+//                         <span className="font-medium">{error}</span>
+//                     </div>
+//                 )}
+
+//                 <form onSubmit={handleSubmit} className="space-y-6 relative z-10">
+//                     <div className="relative">
+//                         <label className="block text-sm font-medium text-gray-700 mb-2">New Password</label>
+//                         <input
+//                             type="password"
+//                             value={password}
+//                             onChange={(e) => setPassword(e.target.value)}
+//                             className="w-full px-4 py-3 border border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+//                             placeholder="Enter new password"
+//                             required
+//                         />
+//                     </div>
+
+//                     <div className="relative">
+//                         <label className="block text-sm font-medium text-gray-700 mb-2">Confirm Password</label>
+//                         <input
+//                             type="password"
+//                             value={confirmPassword}
+//                             onChange={(e) => setConfirmPassword(e.target.value)}
+//                             className="w-full px-4 py-3 border border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+//                             placeholder="Confirm your password"
+//                             required
+//                         />
+//                     </div>
+
+//                     <button 
+//                         type="submit"
+//                         disabled={isLoading}
+//                         className="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white py-3 px-4 rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-200 font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
+//                     >
+//                         {isLoading ? "Processing..." : "Reset Password"}
+//                     </button>
+//                 </form>
+
+//                 <div className="absolute bottom-0 left-0 right-0 h-2 bg-gradient-to-r from-blue-400 via-blue-500 to-blue-600 rounded-b-2xl"></div>
+//             </div>
+//         </div>
+//     );
+// };
+
+// export default ResetPassword;
+
+
+
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import resetImage from '../../assets/imgg/blog2.jpg'; // replace with your image
 
 const ResetPassword = () => {
-    const { token } = useParams();
-    const navigate = useNavigate();
-    const [password, setPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
-    const [message, setMessage] = useState('');
-    const [error, setError] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
+  const { token } = useParams();
+  const navigate = useNavigate();
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        if (password !== confirmPassword) {
-            setError('Passwords do not match');
-            return;
-        }
-        setIsLoading(true);
-        try {
-            const response = await fetch(`http://localhost:5000/api/v1/users/resetpassword/${token}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ password }),
-            });
-            const data = await response.json();
-            if (response.ok) {
-                setError('');
-                setMessage('Password reset successfully. Redirecting to login page...');
-                setTimeout(() => {
-                    navigate('/login');
-                }, 2000);
-            } else {
-                setError(data.error || 'Failed to reset password.');
-                setMessage('');
-            }
-        } catch (error) {
-            setError('An error occurred. Please try again.');
-            setMessage('');
-        }
-        setIsLoading(false);
-    };
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-    return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-blue-100 to-blue-200 flex items-center justify-center -mt-16 p-4">
-            <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl p-8 relative overflow-hidden">
-                {/* Decorative Elements */}
-                <div className="absolute -top-4 -left-4 w-24 h-24 bg-blue-200 rounded-full opacity-50 blur-lg"></div>
-                <div className="absolute -bottom-4 -right-4 w-24 h-24 bg-blue-300 rounded-full opacity-50 blur-lg"></div>
-                <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-blue-100 to-transparent opacity-40 rounded-full transform translate-x-16 -translate-y-16"></div>
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (password !== confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
+    setIsLoading(true);
+    try {
+      const response = await fetch(`http://localhost:5000/api/v1/users/resetpassword/${token}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password }),
+      });
+      const data = await response.json();
+      if (response.ok) {
+        setError('');
+        setMessage('Password reset successfully. Redirecting to login page...');
+        setTimeout(() => navigate('/login'), 2000);
+      } else {
+        setError(data.error || 'Failed to reset password.');
+        setMessage('');
+      }
+    } catch {
+      setError('An error occurred. Please try again.');
+      setMessage('');
+    }
+    setIsLoading(false);
+  };
 
-                <div className="text-center mb-8 relative">
-                    {/* Sparkles */}
-                    <div className="absolute -top-2 left-12 text-blue-400 transform rotate-45">✦</div>
-                    <div className="absolute top-6 right-16 text-blue-300 transform -rotate-12">✦</div>
-                    
-                    {/* Main Icon */}
-                    <div className="mx-auto w-20 h-20 bg-gradient-to-br from-blue-100 to-blue-200 rounded-2xl flex items-center justify-center mb-4 shadow-lg transform -rotate-3 hover:rotate-0 transition-transform duration-300">
-                        <svg className="w-10 h-10 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                        </svg>
-                    </div>
+  return (
+    <div className="min-h-screen flex items-center justify-center font-[Poppins]  px-4 py-6">
+      <div className="flex flex-col lg:flex-row bg-white rounded-2xl shadow-lg overflow-hidden w-full max-w-6xl h-[600px]">
 
-                    <h2 className="text-3xl font-bold text-gray-800 mb-2">
-                        Reset Password
-                    </h2>
-                    <p className="text-gray-600 text-sm px-4">
-                        Please enter your new password below
-                    </p>
-                </div>
-
-                {message && (
-                    <div className="mb-6 text-green-600 bg-green-50 border-2 border-green-200 p-4 rounded-xl flex items-center">
-                        <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                        </svg>
-                        <span className="font-medium">{message}</span>
-                    </div>
-                )}
-
-                {error && (
-                    <div className="mb-6 text-red-600 bg-red-50 border-2 border-red-200 p-4 rounded-xl flex items-center">
-                        <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                        </svg>
-                        <span className="font-medium">{error}</span>
-                    </div>
-                )}
-
-                <form onSubmit={handleSubmit} className="space-y-6 relative z-10">
-                    <div className="relative">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">New Password</label>
-                        <input
-                            type="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            className="w-full px-4 py-3 border border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                            placeholder="Enter new password"
-                            required
-                        />
-                    </div>
-
-                    <div className="relative">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Confirm Password</label>
-                        <input
-                            type="password"
-                            value={confirmPassword}
-                            onChange={(e) => setConfirmPassword(e.target.value)}
-                            className="w-full px-4 py-3 border border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                            placeholder="Confirm your password"
-                            required
-                        />
-                    </div>
-
-                    <button 
-                        type="submit"
-                        disabled={isLoading}
-                        className="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white py-3 px-4 rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-200 font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                        {isLoading ? "Processing..." : "Reset Password"}
-                    </button>
-                </form>
-
-                <div className="absolute bottom-0 left-0 right-0 h-2 bg-gradient-to-r from-blue-400 via-blue-500 to-blue-600 rounded-b-2xl"></div>
-            </div>
+        {/* Left Image Side */}
+        <div className="lg:w-1/2 w-full h-full">
+          <img
+            src={resetImage}
+            alt="Reset Password Visual"
+            className="w-full h-full object-cover"
+          />
         </div>
-    );
+
+        {/* Right Form Side */}
+        <div className="lg:w-1/2 w-full flex flex-col justify-center px-8 py-10">
+          <div className="max-w-md mx-auto w-full">
+
+            <h2 className="text-3xl font-semibold text-gray-800 mb-4">
+              Reset Password
+            </h2>
+            <p className="text-gray-500 text-sm mb-6">
+              Enter your new password below to reset your account password.
+            </p>
+
+            {message && (
+              <div className="mb-6 text-green-600 bg-green-50 border border-green-200 p-4 rounded-xl">
+                {message}
+              </div>
+            )}
+
+            {error && (
+              <div className="mb-6 text-red-600 bg-red-50 border border-red-200 p-4 rounded-xl">
+                {error}
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div>
+                <label
+                  htmlFor="password"
+                  className="block text-sm font-medium text-gray-700 mb-2"
+                >
+                  New Password
+                </label>
+                <input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Enter new password"
+                  required
+                  className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#1CA59A] focus:border-[#1CA59A] transition"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="confirmPassword"
+                  className="block text-sm font-medium text-gray-700 mb-2"
+                >
+                  Confirm Password
+                </label>
+                <input
+                  id="confirmPassword"
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Confirm your password"
+                  required
+                  className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#1CA59A] focus:border-[#1CA59A] transition"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full bg-[#1CA59A] text-white py-3 rounded-2xl hover:bg-[#159A9C] transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isLoading ? 'Processing...' : 'Reset Password'}
+              </button>
+            </form>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  );
 };
 
 export default ResetPassword;

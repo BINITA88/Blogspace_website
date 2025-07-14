@@ -52,7 +52,8 @@ const SkillsSection = ({ userData, isOwnProfile, onSave }) => {
 					/>
 					<button
 						onClick={handleAddSkill}
-						className='bg-primary text-white py-2 px-4 rounded-r hover:bg-primary-dark transition duration-300'
+		  style={{ backgroundColor: '#159A9C' }}
+						className=' text-white py-2 px-4 rounded-r hover:bg-primary-dark transition duration-300'
 					>
 						Add Skill
 					</button>
@@ -64,7 +65,8 @@ const SkillsSection = ({ userData, isOwnProfile, onSave }) => {
 					{isEditing ? (
 						<button
 							onClick={handleSave}
-							className='mt-4 bg-primary text-white py-2 px-4 rounded hover:bg-primary-dark transition duration-300'
+								  style={{ backgroundColor: '#159A9C' }}
+							className='mt-4  text-white py-2 px-4 rounded hover:bg-primary-dark transition duration-300'
 						>
 							Save Changes
 						</button>

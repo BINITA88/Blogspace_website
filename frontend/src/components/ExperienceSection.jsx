@@ -120,7 +120,11 @@ const ExperienceSection = ({ userData, isOwnProfile, onSave }) => {
 					/>
 					<button
 						onClick={handleAddExperience}
-						className='bg-primary text-white py-2 px-4 rounded hover:bg-primary-dark transition duration-300'
+						 style={{
+    backgroundImage: 'linear-gradient(to right, #159A9C, #76C7C5)',
+    border: 'none'
+  }}
+						className=' text-white py-2 px-4 rounded hover:bg-primary-dark transition duration-300'
 					>
 						Add Experience
 					</button>
@@ -132,7 +136,7 @@ const ExperienceSection = ({ userData, isOwnProfile, onSave }) => {
 					{isEditing ? (
 						<button
 							onClick={handleSave}
-							className='mt-4 bg-primary text-white py-2 px-4 rounded hover:bg-primary-dark transition duration-300'
+	  style={{ backgroundColor: '#159A9C' }}						className='mt-4  text-white py-2 px-4 rounded hover:bg-primary-dark transition duration-300'
 						>
 							Save Changes
 						</button>
