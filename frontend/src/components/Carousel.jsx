@@ -16,10 +16,9 @@ const Carousel = () => {
     'Discover amazing stories, share your thoughts, and connect with writers from around the world. Join our community of passionate storytellers today.'
   ];
 
-  // Split the third text into words
+
   const words = text[2].split(' ');
 
-  // Word-by-word effect
   useEffect(() => {
     const interval = setInterval(() => {
       if (wordIndex < words.length) {
@@ -31,12 +30,12 @@ const Carousel = () => {
     return () => clearInterval(interval);
   }, [wordIndex, words]);
 
-  // Autoplay Logic for images
+ 
   useEffect(() => {
     const autoplay = setInterval(() => {
       handleNext();
-    }, 5000); // Change slides every 5 seconds
-    return () => clearInterval(autoplay); // Cleanup on component unmount
+    }, 5000); 
+    return () => clearInterval(autoplay); 
   }, [currentIndex]);
 
   const handlePrev = () => {
@@ -53,7 +52,7 @@ const Carousel = () => {
 
   return (
     <div className="flex flex-col lg:flex-row justify-between   h-autop-8">
-      {/* Left Section with Text */}
+
       <div className="flex flex-col items-start w-full lg:w-1/2 pr-8 space-y-6 lg:ml-16 lg:mt-14">
         <h2 className="text-4xl lg:text-5xl font-bold text-blue-900 transition-transform transform hover:scale-105">{text[0]}</h2>
         <h3 className="text-3xl lg:text-4xl font-semibold text-orange-500">{text[1]}</h3>
@@ -61,7 +60,7 @@ const Carousel = () => {
           {displayedText}
         </p>
 
-        {/* Buttons */}
+
         <div className="flex space-x-4">
           <Link to="/apply">
  <button
@@ -76,7 +75,7 @@ Explore More</button>
         </div>
       </div>
 
-      {/* Carousel Section */}
+
       <div id="default-carousel" className="relative w-full lg:w-1/2 mt-6 lg:mt-0">
         <div className="relative mx-auto h-56 sm:h-72 md:h-96 lg:h-128 w-full lg:w-96 overflow-hidden rounded-lg border-8 border-white shadow-xl transform hover:scale-105 transition-transform duration-500">
           {images.map((img, index) => (
@@ -93,7 +92,6 @@ Explore More</button>
           ))}
         </div>
 
-        {/* Indicators */}
         <div className="absolute z-30 flex space-x-3 bottom-5 left-1/2 transform -translate-x-1/2">
           {images.map((_, index) => (
             <button
@@ -105,7 +103,7 @@ Explore More</button>
           ))}
         </div>
 
-        {/* Previous Button */}
+
         <button
           type="button"
           className="absolute top-0 left-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none invisible"
